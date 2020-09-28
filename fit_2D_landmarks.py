@@ -131,8 +131,8 @@ def fit_lmk2d(target_img, target_2d_lmks, model_fname, lmk_face_idx, lmk_b_coord
                         cv2.circle(rendered_img, (int(x), int(y)), 4, (255, 0, 0), -1)
                     target_img = np.hstack((target_img, rendered_img))
 
-                cv2.imshow('img', target_img)
-                cv2.waitKey(10)
+                #cv2.imshow('img', target_img)
+                #cv2.waitKey(10)
         else:
             def on_step(*_):
                 pass
