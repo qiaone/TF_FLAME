@@ -54,10 +54,22 @@ def fit_lmk2d(target_img, target_2d_lmks, model_fname, lmk_face_idx, lmk_b_coord
     :return: a mesh with the fitting results
     '''
 
+    '''
+    pred_types = {'face': pred_type(slice(0, 17), (0.682, 0.780, 0.909, 0.5)),
+              'eyebrow1': pred_type(slice(17, 22), (1.0, 0.498, 0.055, 0.4)),
+              'eyebrow2': pred_type(slice(22, 27), (1.0, 0.498, 0.055, 0.4)),
+              'nose': pred_type(slice(27, 31), (0.345, 0.239, 0.443, 0.4)),
+              'nostril': pred_type(slice(31, 36), (0.345, 0.239, 0.443, 0.4)),
+              'eye1': pred_type(slice(36, 42), (0.596, 0.875, 0.541, 0.3)),
+              'eye2': pred_type(slice(42, 48), (0.596, 0.875, 0.541, 0.3)),
+              'lips': pred_type(slice(48, 60), (0.596, 0.875, 0.541, 0.3)),
+              'teeth': pred_type(slice(60, 68), (0.596, 0.875, 0.541, 0.4))
+              }
+    '''
+
     lmks_weights = [[1,1]] * 68
-    for idx, itm in lmks_weights:
-        if 36 < idx < 48:
-            itm[0], itm[1] = 100, 100
+    for idx in range(36, 48):
+      lmks_weights[idx] = [100, 100]
 
     tf_lmks_weights = tf.constant(
         lmks_weights,
