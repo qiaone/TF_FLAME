@@ -54,6 +54,16 @@ def fit_lmk2d(target_img, target_2d_lmks, model_fname, lmk_face_idx, lmk_b_coord
     :return: a mesh with the fitting results
     '''
 
+    lmks_weights = [[1,1]] * 68
+    for idx, itm in lmks_weights:
+        if 36 < idx < 48:
+            itm[0], itm[1] = 100, 100
+
+    tf_lmks_weights = tf.constant(
+        lmks_weights,
+        tf.float64
+    )
+
     tf_trans = tf.Variable(np.zeros((1,3)), name="trans", dtype=tf.float64, trainable=True)
     tf_rot = tf.Variable(np.zeros((1,3)), name="rot", dtype=tf.float64, trainable=True)
     tf_pose = tf.Variable(np.zeros((1,12)), name="pose", dtype=tf.float64, trainable=True)
@@ -81,7 +91,11 @@ def fit_lmk2d(target_img, target_2d_lmks, model_fname, lmk_face_idx, lmk_b_coord
         lmks_proj_2d = tf_project_points(lmks_3d, tf_scale, np.zeros(2))
 
         factor = max(max(target_2d_lmks[:,0]) - min(target_2d_lmks[:,0]),max(target_2d_lmks[:,1]) - min(target_2d_lmks[:,1]))
-        lmk_dist = weights['lmk']*tf.reduce_sum(tf.square(tf.subtract(lmks_proj_2d, target_2d_lmks))) / (factor ** 2)
+        #lmk_dist = weights['lmk']*tf.reduce_sum(tf.square(tf.subtract(lmks_proj_2d, target_2d_lmks))) / (factor ** 2)
+        lmk_dist = weights['lmk']*tf.reduce_sum(
+            tf.square(tf.subtract(lmks_proj_2d, target_2d_lmks)) * tf_lmks_weights
+        ) / (factor ** 2)
+
         neck_pose_reg = weights['neck_pose']*tf.reduce_sum(tf.square(tf_pose[:,:3]))
         jaw_pose_reg = weights['jaw_pose']*tf.reduce_sum(tf.square(tf_pose[:,3:6]))
         eyeballs_pose_reg = weights['eyeballs_pose']*tf.reduce_sum(tf.square(tf_pose[:,6:]))
